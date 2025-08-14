@@ -28,6 +28,19 @@ func (opt *Options) OnAttributeGroup(ele xml.StartElement, protoTree []interface
 			}
 		}
 	}
+
+
+	// Track nesting level
+	opt.AttributeGroupNestLevel++
+
+	// Check if we're inside another AttributeGroup (nested attributeGroup reference)
+	if opt.AttributeGroup.Len() > 0 && opt.InAttributeGroup {
+		// Add this attributeGroup reference to the parent attributeGroup
+		parent := opt.AttributeGroup.Peek().(*AttributeGroup)
+		parent.AttributeGroups = append(parent.AttributeGroups, attributeGroup)
+		return
+	}
+
 	if opt.ComplexType.Len() == 0 {
 		opt.InAttributeGroup = true
 		opt.CurrentEle = opt.InElement
@@ -44,8 +57,15 @@ func (opt *Options) OnAttributeGroup(ele xml.StartElement, protoTree []interface
 
 // EndAttributeGroup handles parsing event on the attributeGroup end elements.
 func (opt *Options) EndAttributeGroup(ele xml.EndElement, protoTree []interface{}) (err error) {
-	if opt.AttributeGroup.Len() > 0 {
-		opt.ProtoTree = append(opt.ProtoTree, opt.AttributeGroup.Pop())
+
+	// Decrease nesting level
+	opt.AttributeGroupNestLevel--
+
+	// Only pop the stack when we return to the top level (nesting level 0) 
+	// and we have an attribute group on the stack
+	if opt.AttributeGroup.Len() > 0 && opt.AttributeGroupNestLevel == 0 && opt.InAttributeGroup {
+		ag := opt.AttributeGroup.Pop().(*AttributeGroup)
+		opt.ProtoTree = append(opt.ProtoTree, ag)
 		opt.CurrentEle = ""
 		opt.InAttributeGroup = false
 	}

@@ -185,11 +185,14 @@ func (gen *CodeGenerator) GoComplexType(v *ComplexType) {
 			content += fmt.Sprintf("\tXMLName\txml.Name\t`xml:\"%s\"`\n", v.Name)
 		}
 		for _, attrGroup := range v.AttributeGroup {
-			fieldType := getBasefromSimpleType(trimNSPrefix(attrGroup.Ref), gen.ProtoTree)
-			if fieldType == "time.Time" {
-				gen.ImportTime = true
+			// AttributeGroup references should be pointers to the AttributeGroup struct type
+			refName := trimNSPrefix(attrGroup.Name)
+			if refName == "" && attrGroup.Ref != "" {
+				refName = trimNSPrefix(attrGroup.Ref)
 			}
-			content += fmt.Sprintf("\t%s\t%s\n", genGoFieldName(attrGroup.Name, false), genGoFieldType(fieldType))
+			fieldName := genGoFieldName(refName, false)
+			fieldType := genGoFieldName(refName, false)
+			content += fmt.Sprintf("\t%s\t*%s\n", fieldName, fieldType)
 		}
 
 		for _, attribute := range v.Attributes {
@@ -288,6 +291,18 @@ func (gen *CodeGenerator) GoAttributeGroup(v *AttributeGroup) {
 			gen.ImportEncodingXML = true
 			content += fmt.Sprintf("\tXMLName\txml.Name\t`xml:\"%s\"`\n", v.Name)
 		}
+
+		// Add nested AttributeGroup references as embedded fields
+		for _, attrGroup := range v.AttributeGroups {
+			refName := trimNSPrefix(attrGroup.Name)
+			if refName == "" && attrGroup.Ref != "" {
+				refName = trimNSPrefix(attrGroup.Ref)
+			}
+			fieldType := genGoFieldName(refName, false)
+			content += fmt.Sprintf("\t*%s\n", fieldType)
+		}
+
+		// Add direct attributes
 		for _, attribute := range v.Attributes {
 			var optional string
 			if attribute.Optional {

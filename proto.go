@@ -117,10 +117,11 @@ type Choice struct {
 // <attributeGroup>).
 // https://www.w3.org/TR/xmlschema-1/structures.html#Attribute_Group_Definition
 type AttributeGroup struct {
-	Doc        string
-	Name       string
-	Ref        string
-	Attributes []Attribute
+	Doc             string
+	Name            string
+	Ref             string
+	Attributes      []Attribute
+	AttributeGroups []AttributeGroup
 }
 
 // Restriction are used to define acceptable values for XML elements or
