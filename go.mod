@@ -1,4 +1,4 @@
-module github.com/xuri/xgen
+module github.com/MarcelInTO/xgen
 
 go 1.23.0
 
