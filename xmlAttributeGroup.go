@@ -29,7 +29,6 @@ func (opt *Options) OnAttributeGroup(ele xml.StartElement, protoTree []interface
 		}
 	}
 
-
 	// Track nesting level
 	opt.AttributeGroupNestLevel++
 
@@ -61,7 +60,7 @@ func (opt *Options) EndAttributeGroup(ele xml.EndElement, protoTree []interface{
 	// Decrease nesting level
 	opt.AttributeGroupNestLevel--
 
-	// Only pop the stack when we return to the top level (nesting level 0) 
+	// Only pop the stack when we return to the top level (nesting level 0)
 	// and we have an attribute group on the stack
 	if opt.AttributeGroup.Len() > 0 && opt.AttributeGroupNestLevel == 0 && opt.InAttributeGroup {
 		ag := opt.AttributeGroup.Pop().(*AttributeGroup)

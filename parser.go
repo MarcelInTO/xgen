@@ -37,13 +37,13 @@ type Options struct {
 	ProtoTree           []interface{}
 	RemoteSchema        map[string][]byte
 
-	InElement                string
-	CurrentEle               string
-	InGroup                  int
-	InUnion                  bool
-	InAttributeGroup         bool
-	AttributeGroupNestLevel  int
-	InPluralSequence         []bool
+	InElement               string
+	CurrentEle              string
+	InGroup                 int
+	InUnion                 bool
+	InAttributeGroup        bool
+	AttributeGroupNestLevel int
+	InPluralSequence        []bool
 
 	SimpleType     *Stack
 	ComplexType    *Stack

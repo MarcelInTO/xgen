@@ -180,6 +180,8 @@ func (gen *CodeGenerator) GoComplexType(v *ComplexType) {
 	if _, ok := gen.StructAST[v.Name]; !ok {
 		content := " struct {\n"
 		fieldName := genGoFieldName(v.Name, true)
+
+		// Always add XMLName when field name differs from type name or when there are namespace concerns
 		if fieldName != v.Name {
 			gen.ImportEncodingXML = true
 			content += fmt.Sprintf("\tXMLName\txml.Name\t`xml:\"%s\"`\n", v.Name)
@@ -227,7 +229,7 @@ func (gen *CodeGenerator) GoComplexType(v *ComplexType) {
 			if fieldType == "time.Time" {
 				gen.ImportTime = true
 			}
-			content += fmt.Sprintf("\t%s\t%s%s\t`xml:\"%s%s\"`\n", genGoFieldName(element.Name, false), plural, fieldType, element.Name, optional)
+			content += fmt.Sprintf("\t%s\t%s%s\t`xml:\"%s%s\"`\n", genGoFieldName(element.Name, false), plural, fieldType, trimNSPrefix(element.Name), optional)
 		}
 		if len(v.Base) > 0 {
 			// If the type is a built-in type, generate a Value field as chardata.
@@ -353,3 +355,4 @@ func (gen *CodeGenerator) FileWithExtension(extension string) string {
 	}
 	return gen.File + extension
 }
+
